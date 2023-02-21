@@ -12,9 +12,26 @@ var (
 	ErrUnsupportedChar = errors.New("only '+', digit and '#' char are supported")
 )
 
-func CreateCard(name string, number string) (vcard.Card, error) {
-	if len(number) == 0 {
+func CreateCard(name string, numbers []string) (vcard.Card, error) {
+	if len(numbers) == 0 {
 		return nil, ErrEmptyNumber
+	}
+	card := vcard.Card{}
+	card.AddValue(vcard.FieldVersion, "3.0")
+
+	card.AddName(&vcard.Name{GivenName: name})
+
+	for _, number := range numbers {
+		if err := addNumbersOfPatternToCard(card, number); err != nil {
+			return nil, err
+		}
+	}
+	return card, nil
+}
+
+func addNumbersOfPatternToCard(card vcard.Card, number string) error {
+	if len(number) == 0 {
+		return ErrEmptyNumber
 	}
 
 	for pos, ch := range number {
@@ -22,19 +39,14 @@ func CreateCard(name string, number string) (vcard.Card, error) {
 			if pos == 0 {
 				continue
 			}
-			return nil, ErrInvalidPlusSign
+			return ErrInvalidPlusSign
 		}
 		if ch != '#' && (ch < '0' || '9' < ch) {
-			return nil, ErrUnsupportedChar
+			return ErrUnsupportedChar
 		}
 	}
-
-	card := vcard.Card{}
-	card.AddValue(vcard.FieldVersion, "3.0")
-
-	card.AddName(&vcard.Name{GivenName: name})
 	backtrack(card, []byte(number), 0)
-	return card, nil
+	return nil
 }
 
 func backtrack(card vcard.Card, pattern []byte, idx int) {

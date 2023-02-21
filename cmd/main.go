@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/briannqc/spamfighter"
 	"github.com/emersion/go-vcard"
@@ -12,12 +13,13 @@ import (
 
 func main() {
 	name := flag.String("name", "Spammer", "The contact name for the spammer")
-	numberPattern := flag.String(
-		"number",
+	numberPatterns := flag.String(
+		"numbers",
 		"",
-		`Phone number(s) of the spammer. The number can start with '+'.
+		`Comma separated phone numbers of the spammer. Each number can start with '+'.
 '#' can also be used to substitute any digits form '0' to '9',
-e.g. +84598382### matches all the numbers from +84598382000 to +84598382999.`)
+e.g. +84598382### matches all the numbers from +84598382000 to +84598382999;
++845983824##,+845983826## matches all the numbers of +84598382400 ~ +84598382499 and +84598382600 ~ +84598382699`)
 
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, "Create a vcf files of the spammers to fight against them!")
@@ -34,7 +36,7 @@ vcf files into their Contacts app to block the spammers.`)
 	}
 	flag.Parse()
 
-	card, err := spamfighter.CreateCard(*name, *numberPattern)
+	card, err := spamfighter.CreateCard(*name, strings.Split(*numberPatterns, ","))
 	if err != nil {
 		log.Fatal("Creating a vCard failed", err)
 	}

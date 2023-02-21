@@ -25,11 +25,12 @@ files into their Contacts app to block the spammers.
 $ go run cmd/main.go -help
   -name string
         The contact name for the spammer (default "Spammer")
-  -number string
-        Phone number(s) of the spammer. The number can start with '+'.
+  -numbers string
+        Comma separated phone numbers of the spammer. Each number can start with '+'.
         '#' can also be used to substitute any digits form '0' to '9',
-        e.g. +84598382### matches all the numbers from +84598382000 to +84598382999.
+        e.g. +84598382### matches all the numbers from +84598382000 to +84598382999;
+        +845983824##,+845983826## matches all the numbers of +84598382400 ~ +84598382499 and +84598382600 ~ +84598382699
 
-$ go run cmd/main.go -name=Spammer -number=+84598382### 
+$ go run cmd/main.go -name=Spammer -numbers=+845983823##,+845983824##
 DONE! Import Spammer.vcf file to your Contacts app to fight against spammers!
 ```
